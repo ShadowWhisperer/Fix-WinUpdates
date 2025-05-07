@@ -1,2 +1,5 @@
-# Fix-WinUpdates
-Attempt at fixing common Windows Updates issues, with a batch script
+- Set required services to start  
+- Deleting Pending/Cached Updates  
+- Delete malformed Registry Keys  
+- Don't install updates ASAP  
+- Remove update version restraint  
