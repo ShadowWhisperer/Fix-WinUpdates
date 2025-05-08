@@ -1,16 +1,17 @@
 @echo off
+title Fix Windows Updates
 
 cls
-echo Stopping Services
+echo 1/7 - Stopping Services
 for %%s in (BITS wuauserv) do net stop %%s >nul 2>&1
 
-echo Configuring services
+echo 2/7 - Configuring services
 sc config wuauserv start= auto >nul 2>&1
 sc config BITS start= delayed-auto >nul 2>&1
 sc config AppReadiness start= manual >nul 2>&1
 sc config CryptSvc start= auto >nul 2>&1
 
-echo Deleting Pending/Cached Updates
+echo 3/7 - Deleting Pending/Cached Updates
 if exist "C:\Windows\Temp\" for /F "delims=" %%i in ('dir /b "C:\Windows\Temp\"') do (rmdir "C:\Windows\Temp\%%i" /s/q || del "C:\Windows\Temp\%%i" /s/q) >nul 2>&1
 if exist "C:\Windows\System32\config\systemprofile\AppData\Local\Microsoft\Windows\Temporary Internet Files\%%i" in ('dir /b ""') do (rmdir "C:\Windows\System32\config\systemprofile\AppData\Local\Microsoft\Windows\Temporary Internet Files\%%i" /s/q || del "C:\Windows\System32\config\systemprofile\AppData\Local\Microsoft\Windows\Temporary Internet Files\%%i" /s/q) >nul 2>&1
 if exist "C:\Windows\Prefetch\" for /F "delims=" %%i in ('dir /b "C:\Windows\Prefetch\"') do (rmdir "C:\Windows\Prefetch\%%i" /s/q || del "C:\Windows\Prefetch\%%i" /s/q) >nul 2>&1
@@ -19,7 +20,8 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Up
 reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\PostRebootReporting" /f >nul 2>&1
 
 ::Malformed Keys
-echo Deleting Bad Registry Keys
+echo 4/7 - Deleting Bad Registry Keys
+setlocal EnableDelayedExpansion
 set "reg_path=HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore"
 for /f "tokens=*" %%k in ('reg query "%reg_path%" /s 2^>nul ^| findstr /b /i "%reg_path%"') do (
     set "full_key=%%k"
@@ -38,14 +40,15 @@ for /f "tokens=*" %%k in ('reg query "%reg_path%" /s 2^>nul ^| findstr /b /i "%r
             set "delete_key=true"
         ) else (
             :: Check for letters
-            echo !key_name! | findstr /r /c:"[a-zA-Z]" >nul
+            echo /7 - !key_name! | findstr /r /c:"[a-zA-Z]" >nul
             if !errorlevel! neq 0 set "delete_key=true"
         )
     )
     if "!delete_key!"=="true" reg delete "!full_key!" /f >nul 2>&1
 )
+endlocal
 
-echo Applying Various Fixes
+echo 5/7 - Applying Various Fixes
 rmdir /s/q %windir%\system32\catroot2 >nul 2>&1
 mkdir %windir%\system32\catroot2 >nul 2>&1
 attrib -h -r -s %windir%\system32\catroot2 >nul 2>&1
@@ -74,13 +77,13 @@ reg delete "HKLM\SOFTWARE\Policies\Microsoft\WindowsStore" /v DisableOSUpgrade /
 reg delete "HKLM\SYSTEM\Setup\UpgradeNotification" /v UpgradeAvailable /f >nul 2>&1
 
 
-echo Finalizing
+echo 6/7 - Finalizing
 gpupdate /force >nul 2>&1
 
 
 echo.
 echo.
-echo Script completed. A reboot is required to finish.
+echo  Script completed. A reboot is required to finish.
 echo.
 echo.   Press  "Enter"  to reboot
 echo.
