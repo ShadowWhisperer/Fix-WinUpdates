@@ -64,6 +64,8 @@ netsh winsock reset >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v IsContinuousInnovationOptedIn /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v AllowOptionalContent /t REG_DWORD /d 0 /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" /v SetAllowOptionalContent/t REG_DWORD /d 0 /f >nul 2>&1
+::Disable "Lets finish setting up your device" - Asks to change to online account
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" /v ScoobeSystemSettingEnabled /t REG_DWORD /d 0 /f >nul 2>&1
 ::
 reg delete "HKCU\Software\Policies\Microsoft\Windows\WindowsUpdate\AU" /v NoAUAsDefaultShutdownOption /f >nul 2>&1
 ::
@@ -89,3 +91,4 @@ echo.   Press  "Enter"  to reboot
 echo.
 pause
 shutdown /r /t 10
+
