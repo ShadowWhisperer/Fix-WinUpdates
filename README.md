@@ -3,3 +3,4 @@
 - Delete malformed Registry Keys  
 - Don't install updates ASAP  
 - Remove update version restraint  
+- Disable "Lets finish setting up your device"  
