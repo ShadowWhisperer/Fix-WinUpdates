@@ -34,7 +34,7 @@ for /f "tokens=*" %%k in ('reg query "%reg_path%" /s 2^>nul ^| findstr /b /i "%r
             set "delete_key=true"
         ) else (
             rem Check for letters
-            echo(!key_name!| findstr /r /c:"[a-zA-Z]" >nul
+            echo(!key_name!| findstr /r /c:"[a-zA-Z]" >NUL
             if !errorlevel! neq 0 set "delete_key=true"
         )
     )
